@@ -3,97 +3,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const noticeModal = document.getElementById('noticeModal');
     const agreeCheckbox = document.getElementById('agreeCheckbox');
     const proceedButton = document.getElementById('proceedButton');
-    const modalProceedButton = noticeModal.querySelector('#modalProceedButton'); // Get the proceed button inside the modal
+    const modalProceedButton = noticeModal.querySelector('#modalProceedButton'); 
 
     loginForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        const password = document.getElementById('password').value;
+      event.preventDefault();
+      const password = document.getElementById('password').value;
 
-        if (password === 'demotesting') {
-            // Set session variable and redirect to DemoAccess.html
-            sessionStorage.setItem('loggedIn', 'true');
-            sessionStorage.setItem('demouser', 'true'); // Set demouser to true
-            
-            // Set expiration time to 5 minutes
-            const expirationTime = new Date().getTime() + (5 * 60 * 1000); // 5 minutes in milliseconds
-            sessionStorage.setItem('expirationTime', expirationTime);
-            
-            // Redirect to DemoAccess.html
-            window.location.href = 'DemoAccess.html';
-            return; // Skip the API request
-        }
-        
-        // Make an API request to validate the key
-        fetch('https://your-backend-url.onrender.com/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                key: password,
-            }),
+      if (password === 'demotesting') {
+        sessionStorage.setItem('loggedIn', 'true');
+        sessionStorage.setItem('demouser', 'true');
+        const expirationTime = new Date().getTime() + (5 * 60 * 1000);
+        sessionStorage.setItem('expirationTime', expirationTime);
+        window.location.href = 'DemoAccess.html'; 
+        return;
+      }
+
+      fetch('https://back-game-1.onrender.com/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            key: password,
+          }),
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(errorResponse => {
-                    throw new Error(errorResponse.error);
-                });
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('API Response:', data);
+          console.log('API Response:', data);
 
-            if (data.valid) {
-                if (data.expired) {
-                    alertWithLink('Key has expired. Please purchase a new key.');
-                } else {
-                    const expirationTime = new Date(data.expirationTime).getTime();
-                    sessionStorage.setItem('loggedIn', 'true');
-                    sessionStorage.setItem('demouser', 'false'); // Set demouser to false
-                    sessionStorage.setItem('expirationTime', expirationTime);
-                    noticeModal.style.display = 'block';
-                }
-            } else {
-                alertWithLink('Invalid Key. Please try again.');
-            }
+          if (data.success) {
+            const expirationTime = new Date().getTime() + (5 * 60 * 1000);
+            sessionStorage.setItem('loggedIn', 'true');
+            sessionStorage.setItem('demouser', 'false');
+            sessionStorage.setItem('expirationTime', expirationTime);
+            noticeModal.style.display = 'block';
+          } else {
+            alertWithLink('Invalid Key. Please try again.');
+          }
         })
         .catch(error => {
-            console.error('Error occurred during key validation:', error.message);
-            alertWithLink('An error occurred. Please try again later.');
+          console.error('Error occurred during key validation:', error.message);
+          alertWithLink('An error occurred. Please try again later.');
         });
     });
 
     function alertWithLink(message) {
-        const alertMessage = message + ' Invalid, please buy from <a href="https://www.instagram.com//">Instagram</a>.';
-        const tempElement = document.createElement('div');
-        tempElement.innerHTML = alertMessage;
-        alert(tempElement.textContent || tempElement.innerText);
-        setTimeout(function () {
-            window.location.href = 'https://www.instagram.com/';
-        }, 5000); // Redirect to Instagram after 5 seconds
+      const alertMessage = message + ' Invalid, please buy from <a href="https://www.instagram.com/">Instagram</a>.';
+      const tempElement = document.createElement('div');
+      tempElement.innerHTML = alertMessage;
+      alert(tempElement.textContent || tempElement.innerText);
+      setTimeout(function () {
+        window.location.href = 'https://www.instagram.com/';
+      }, 5000);
     }
 
-    // Close the modal when the close button is clicked
     noticeModal.querySelector('.close').addEventListener('click', function () {
-        noticeModal.style.display = 'none';
+      noticeModal.style.display = 'none';
     });
 
-    // Proceed button functionality
     proceedButton.addEventListener('click', function () {
-        if (agreeCheckbox.checked) {
-            // Redirect to the second page
-            window.location.href = 'login.html';
-        } else {
-            alert('Please agree to the terms and conditions to proceed.');
-        }
+      if (agreeCheckbox.checked) {
+        window.location.href = 'login.html';
+      } else {
+        alert('Please agree to the terms and conditions to proceed.');
+      }
     });
 
-    // Proceed button functionality inside the modal
     modalProceedButton.addEventListener('click', function () {
-        // Close the modal
-        noticeModal.style.display = 'none';
-        // Redirect to DemoAccess.html
-        window.location.href = 'DemoAccess.html';
+      noticeModal.style.display = 'none';
+      window.location.href = 'DemoAccess.html';
     });
 });
