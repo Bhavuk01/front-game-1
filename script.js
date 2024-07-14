@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      fetch('https://back-game-1.onrender.com/api/login', {
+      fetch('https://back-game-2.onrender.com/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
